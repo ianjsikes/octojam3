@@ -1,0 +1,42 @@
+: darwinian
+    0b00000000
+    0b00010000
+    0b00010000
+    0b01111100
+    0b00010000
+    0b00111000
+    0b00101000
+    0b00101000
+
+: draw-player
+    va := v0
+    vc := 0b00111 # low 3 bits of v0 are the x coordinate
+    va &= vc      # mask them off
+    va <<= va     # multiply by 8 to get pixels
+    va <<= va
+    va <<= va
+
+    vb := v0
+    vc := 0b11000 # high 2 bits of v0 are the y coordinate
+    vb &= vc      # mask them off
+                  # and they're already in pixels!
+
+    i := darwinian
+    sprite va vb 8
+;
+
+: main
+    v0 := 12 # the player's position in tiles
+    loop
+        draw-player
+        v1 := key     # wait for a keypress
+        draw-player   # erase the player before moving
+
+        # assuming a default keyboard layout,
+        # these numbers will map to ASWD:
+
+        if v1 == 7 then v0 += -1 # move left
+        if v1 == 9 then v0 +=  1 # move right
+        if v1 == 5 then v0 += -8 # move up
+        if v1 == 8 then v0 +=  8 # move down
+    again
